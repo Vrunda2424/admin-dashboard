@@ -21,3 +21,4 @@ src/
 
 ## Note
 Credentials are hard-coded for this task only. A real app must verify them on a server
+(for example, a Flask API that returns a token).

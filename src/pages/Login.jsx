@@ -48,8 +48,8 @@ export default function Login() {
       <aside className="brand-panel">
         <Logo />
         <div className="brand-copy">
-          <h2>Sign in to see your workspace.</h2>
-        
+          <h2>Everything your team needs, in one dashboard.</h2>
+          <p>Sign in to see your workspace.</p>
         </div>
       </aside>
 
