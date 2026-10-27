@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import { Menu, User, LogOut } from "lucide-react";
 import Logo from "./Logo.jsx";
 
 export default function Navbar({ onMenuClick }) {
@@ -32,9 +33,7 @@ export default function Navbar({ onMenuClick }) {
     <header className="navbar">
       <div className="navbar-left">
         <button type="button" className="menu-btn" aria-label="Toggle navigation menu" onClick={onMenuClick}>
-          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
+          <Menu size={20} aria-hidden="true" />
         </button>
         <Logo />
       </div>
@@ -47,16 +46,13 @@ export default function Navbar({ onMenuClick }) {
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
-          </svg>
+          <User size={20} aria-hidden="true" />
         </button>
         {open && (
           <div className="dropdown" role="menu">
             <p className="dropdown-user">{username}</p>
             <button type="button" role="menuitem" className="dropdown-logout" onClick={handleLogout}>
-              Logout
+              <LogOut size={16} aria-hidden="true" /> Logout
             </button>
           </div>
         )}

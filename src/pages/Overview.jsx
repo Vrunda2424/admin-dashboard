@@ -1,3 +1,4 @@
+import { Users, UserCheck, UserX, UserPlus } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import SummaryCard from "../components/SummaryCard.jsx";
@@ -11,10 +12,10 @@ import { summary, monthlyRegistrations, userGrowth, statusBreakdown, recentUsers
 export default function Overview() {
   const { username } = useAuth();
   const cards = [
-    { label: "Total registered users", value: summary.total },
-    { label: "Active users", value: summary.active },
-    { label: "Inactive users", value: summary.inactive },
-    { label: "New registrations this month", value: summary.newThisMonth },
+    { label: "Total registered users", value: summary.total, icon: Users },
+    { label: "Active users", value: summary.active, icon: UserCheck },
+    { label: "Inactive users", value: summary.inactive, icon: UserX },
+    { label: "New registrations this month", value: summary.newThisMonth, icon: UserPlus },
   ];
 
   return (
