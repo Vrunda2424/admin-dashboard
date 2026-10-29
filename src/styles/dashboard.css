@@ -125,3 +125,6 @@ th { background: #f6f9fc; }
   .toolbar select { flex: 1 1 100%; width: 100%; }
   .table-footer { flex-direction: column; align-items: flex-start; }
 }
+
+/* Login and Register pages */
+.login-card .btn-secondary { justify-content: center; padding: 12px; text-decoration: none; }

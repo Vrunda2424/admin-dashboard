@@ -1,9 +1,7 @@
 import { createContext, useContext, useState } from "react";
+import { loginRequest } from "../services/api.js";
 
 const STORAGE_KEY = "username";
-// Dummy credentials for this task only. Real apps verify credentials on a server.
-const DUMMY_USER = { username: "admin", password: "admin123" };
-
 const AuthContext = createContext(null);
 
 const readStoredUser = () => {
@@ -18,14 +16,16 @@ export function AuthProvider({ children }) {
   // Reading storage in the initializer keeps the session after a page refresh.
   const [username, setUsername] = useState(readStoredUser);
 
-  const login = (inputUser, inputPassword) => {
-    const valid =
-      inputUser === DUMMY_USER.username && inputPassword === DUMMY_USER.password;
-    if (valid) {
-      localStorage.setItem(STORAGE_KEY, inputUser);
-      setUsername(inputUser);
+  // Returns { ok: true } or { ok: false, message } so the page can show the error.
+  const login = async (inputUser, inputPassword) => {
+    try {
+      const { user } = await loginRequest(inputUser, inputPassword);
+      localStorage.setItem(STORAGE_KEY, user.username);
+      setUsername(user.username);
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, message: err.message };
     }
-    return valid;
   };
 
   const logout = () => {
@@ -34,9 +34,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ username, isAuthenticated: Boolean(username), login, logout }}
-    >
+    <AuthContext.Provider value={{ username, isAuthenticated: Boolean(username), login, logout }}>
       {children}
     </AuthContext.Provider>
   );

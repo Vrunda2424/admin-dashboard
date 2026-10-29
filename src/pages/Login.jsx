@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import AuthLayout from "../components/AuthLayout.jsx";
 import FormField from "../components/FormField.jsx";
-import Logo from "../components/Logo.jsx";
 
 const validate = ({ username, password }) => {
   const errors = {};
@@ -16,9 +16,11 @@ const validate = ({ username, password }) => {
 export default function Login() {
   const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
+  const { state } = useLocation();
   const [values, setValues] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Logged-in users do not need to see the login page again.
   if (isAuthenticated) return <Navigate to="/dashboard" replace />;
@@ -30,42 +32,34 @@ export default function Login() {
     setLoginError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const found = validate(values);
     setErrors(found);
     if (Object.keys(found).length > 0) return;
 
-    if (login(values.username.trim(), values.password)) {
-      navigate("/dashboard", { replace: true });
-    } else {
-      setLoginError("Incorrect username or password. Check your details and try again.");
-    }
+    setLoading(true);
+    const result = await login(values.username.trim(), values.password);
+    setLoading(false);
+    if (result.ok) navigate("/dashboard", { replace: true });
+    else setLoginError(result.message);
   };
 
   return (
-    <main className="login-page">
-      <aside className="brand-panel">
-        <Logo />
-        <div className="brand-copy">
-          <h2>Everything your team needs, in one dashboard.</h2>
-          <p>Sign in to see your workspace.</p>
-        </div>
-      </aside>
+    <AuthLayout>
+      <form className="login-card" onSubmit={handleSubmit} noValidate>
+        <h1>Sign in</h1>
+        <p className="muted">Use your account to continue.</p>
 
-      <section className="form-panel">
-        <form className="login-card" onSubmit={handleSubmit} noValidate>
-          <h1>Sign in</h1>
-          <p className="muted">Use your admin account to continue.</p>
+        {state?.registered && !loginError && <div className="success" role="status">Account created. Please sign in.</div>}
+        {loginError && <div className="alert" role="alert">{loginError}</div>}
 
-          {loginError && <div className="alert" role="alert">{loginError}</div>}
+        <FormField label="Username" name="username" value={values.username} onChange={handleChange} error={errors.username} autoComplete="username" />
+        <FormField label="Password" name="password" type="password" value={values.password} onChange={handleChange} error={errors.password} autoComplete="current-password" />
 
-          <FormField label="Username" name="username" value={values.username} onChange={handleChange} error={errors.username} autoComplete="username" />
-          <FormField label="Password" name="password" type="password" value={values.password} onChange={handleChange} error={errors.password} autoComplete="current-password" />
-
-          <button type="submit" className="btn-primary">Sign in</button>
-        </form>
-      </section>
-    </main>
+        <button type="submit" className="btn-primary" disabled={loading}>{loading ? "Signing in..." : "Sign in"}</button>
+        <Link to="/register" className="btn-secondary">Register</Link>
+      </form>
+    </AuthLayout>
   );
 }
