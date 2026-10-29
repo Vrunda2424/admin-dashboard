@@ -128,3 +128,12 @@ th { background: #f6f9fc; }
 
 /* Login and Register pages */
 .login-card .btn-secondary { justify-content: center; padding: 12px; text-decoration: none; }
+
+/* User Access Management */
+.dropdown { min-width: 230px; }
+.dropdown-item {
+  width: 100%; margin-top: 6px; padding: 9px 10px; display: flex; align-items: center; gap: 8px;
+  text-align: left; font: inherit; cursor: pointer; color: var(--ink); background: none; border: 0; border-radius: 6px;
+}
+.dropdown-item:hover { background: var(--bg); }
+.page-top { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px; }

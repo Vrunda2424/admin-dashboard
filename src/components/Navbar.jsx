@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Menu, User, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
-import { Menu, User, LogOut } from "lucide-react";
 import Logo from "./Logo.jsx";
 
 export default function Navbar({ onMenuClick }) {
@@ -23,6 +23,11 @@ export default function Navbar({ onMenuClick }) {
       document.removeEventListener("keydown", onKey);
     };
   }, []);
+
+  const goToUam = () => {
+    setOpen(false);
+    navigate("/uam");
+  };
 
   const handleLogout = () => {
     logout();
@@ -51,6 +56,9 @@ export default function Navbar({ onMenuClick }) {
         {open && (
           <div className="dropdown" role="menu">
             <p className="dropdown-user">{username}</p>
+            <button type="button" role="menuitem" className="dropdown-item" onClick={goToUam}>
+              <ShieldCheck size={16} aria-hidden="true" /> User Access Management
+            </button>
             <button type="button" role="menuitem" className="dropdown-logout" onClick={handleLogout}>
               <LogOut size={16} aria-hidden="true" /> Logout
             </button>
