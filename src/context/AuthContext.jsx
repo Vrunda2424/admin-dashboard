@@ -16,7 +16,7 @@ export function AuthProvider({ children }) {
   // Reading storage in the initializer keeps the session after a page refresh.
   const [username, setUsername] = useState(readStoredUser);
 
-  // Returns { ok: true } or { ok: false, message } so the page can show the error.
+  // Returns { ok: true } or { ok: false, message, status } so the page can react to it.
   const login = async (inputUser, inputPassword) => {
     try {
       const { user } = await loginRequest(inputUser, inputPassword);
@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
       setUsername(user.username);
       return { ok: true };
     } catch (err) {
-      return { ok: false, message: err.message };
+      return { ok: false, message: err.message, status: err.status };
     }
   };
 

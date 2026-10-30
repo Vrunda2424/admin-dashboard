@@ -13,7 +13,11 @@ async function request(path, body) {
     throw new Error("Cannot reach the server. Check that the Flask backend is running.");
   }
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.message || "Something went wrong. Please try again.");
+  if (!response.ok) {
+    const error = new Error(data.message || "Something went wrong. Please try again.");
+    error.status = response.status;
+    throw error;
+  }
   return data;
 }
 

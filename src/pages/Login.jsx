@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import AuthLayout from "../components/AuthLayout.jsx";
 import FormField from "../components/FormField.jsx";
 
@@ -9,14 +10,14 @@ const validate = ({ username, password }) => {
   if (!username.trim()) errors.username = "Enter your username.";
   else if (username.trim().length < 3) errors.username = "Username must be at least 3 characters.";
   if (!password) errors.password = "Enter your password.";
-  else if (password.length < 6) errors.password = "Password must be at least 6 characters.";
   return errors;
 };
 
 export default function Login() {
   const { isAuthenticated, login } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
-  const { state } = useLocation();
+  const registered = useLocation().state?.registered;
   const [values, setValues] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState("");
@@ -41,8 +42,14 @@ export default function Login() {
     setLoading(true);
     const result = await login(values.username.trim(), values.password);
     setLoading(false);
-    if (result.ok) navigate("/dashboard", { replace: true });
-    else setLoginError(result.message);
+    if (result.ok) {
+      showToast("Login successful", "success");
+      navigate("/dashboard", { replace: true });
+    } else {
+      // 401 means wrong credentials. Other errors (server off, inactive) show their own text.
+      showToast(result.status === 401 ? "Invalid credentials" : result.message, "error");
+      setLoginError(result.message);
+    }
   };
 
   return (
@@ -51,14 +58,14 @@ export default function Login() {
         <h1>Sign in</h1>
         <p className="muted">Use your account to continue.</p>
 
-        {state?.registered && !loginError && <div className="success" role="status">Account created. Please sign in.</div>}
+        {registered && !loginError && <div className="success" role="status">Account created. Please sign in.</div>}
         {loginError && <div className="alert" role="alert">{loginError}</div>}
 
         <FormField label="Username" name="username" value={values.username} onChange={handleChange} error={errors.username} autoComplete="username" />
         <FormField label="Password" name="password" type="password" value={values.password} onChange={handleChange} error={errors.password} autoComplete="current-password" />
 
         <button type="submit" className="btn-primary" disabled={loading}>{loading ? "Signing in..." : "Sign in"}</button>
-        <Link to="/register" className="btn-secondary">Register</Link>
+        <button type="button" className="btn-secondary btn-block" onClick={() => navigate("/register")}>Register</button>
       </form>
     </AuthLayout>
   );
