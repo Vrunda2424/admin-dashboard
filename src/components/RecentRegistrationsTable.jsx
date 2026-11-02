@@ -10,14 +10,18 @@ export default function RecentRegistrationsTable({ users }) {
             <tr><th>Name</th><th>Email</th><th>Status</th><th>Registered</th></tr>
           </thead>
           <tbody>
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td>{u.name}</td>
-                <td>{u.email}</td>
-                <td><span className={`badge ${u.status.toLowerCase()}`}>{u.status}</span></td>
-                <td>{formatDate(u.registeredAt)}</td>
-              </tr>
-            ))}
+            {users.length === 0 ? (
+              <tr><td colSpan={4} className="empty">No registrations in this date range.</td></tr>
+            ) : (
+              users.map((u) => (
+                <tr key={u.id}>
+                  <td>{u.name}</td>
+                  <td>{u.email}</td>
+                  <td><span className={`badge ${u.status.toLowerCase()}`}>{u.status}</span></td>
+                  <td>{formatDate(u.registeredAt)}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

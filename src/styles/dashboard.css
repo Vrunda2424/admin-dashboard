@@ -194,11 +194,10 @@ th { background: #f6f9fc; }
 .modal h3 { margin: 0; font-size: 1.2rem; }
 
 /* ---- Dark mode: set on <html data-theme="dark"> ---- */
-
 html[data-theme="dark"] {
   color-scheme: dark;
-  --ink: #e6edf5; --muted: #9aa8b8; --bg: #2b0118; --surface: #151503; --field: #0e1726; --border: #152539;
-  --accent: #1a9aa6; --accent-dark: #147e88; --danger: #ff8a85; --danger-bg: #281416;
+  --ink: #e6edf5; --muted: #9aa8b8; --bg: #0b1220; --surface: #121c2e; --field: #0e1726; --border: #243247;
+  --accent: #1a9aa6; --accent-dark: #147e88; --danger: #ff8a85; --danger-bg: #3a1b1e;
 }
 [data-theme="dark"] .shell { background: var(--bg); }
 [data-theme="dark"] .nav-link:hover { background: var(--bg); }
@@ -214,3 +213,66 @@ html[data-theme="dark"] {
 [data-theme="dark"] .recharts-cartesian-grid line { stroke: var(--border); }
 [data-theme="dark"] .recharts-default-tooltip { background: var(--surface) !important; border-color: var(--border) !important; }
 [data-theme="dark"] .recharts-tooltip-label, [data-theme="dark"] .recharts-legend-item-text { color: var(--ink) !important; }
+
+/* ---- Date range, CAPTCHA, collapsible sidebar ---- */
+:root { --chart-1: #0e7c86; --chart-2: #5b5bd6; --chart-3: #f5a524; --role-admin: #e5484d; --role-editor: #5b5bd6; --role-viewer: #0e7c86; }
+.range-picker { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.range-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.range-btn { padding: 8px 12px; font: inherit; font-size: 0.85rem; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
+.range-btn:hover { border-color: var(--accent); }
+.range-btn.active { color: #fff; background: var(--accent); border-color: var(--accent); }
+.range-label { margin: 0; font-size: 0.8rem; }
+
+.captcha-row { display: flex; align-items: stretch; gap: 8px; }
+.captcha-box {
+  flex: 1; min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 3px; padding: 6px 10px;
+  overflow: hidden; user-select: none; border: 1px solid var(--border); border-radius: 6px; background-color: #e9eef5;
+  background-image: repeating-linear-gradient(115deg, rgba(15, 27, 45, 0.16) 0 2px, transparent 2px 9px), repeating-linear-gradient(-25deg, rgba(14, 124, 134, 0.2) 0 1px, transparent 1px 7px);
+}
+.captcha-char { display: inline-block; font-family: "Courier New", monospace; font-weight: 700; line-height: 1; }
+
+.shell { transition: grid-template-columns 0.25s ease; }
+.nav-link { position: relative; }
+.collapse-btn { display: none; }
+@media (min-width: 1025px) {
+  .sidebar { z-index: 20; }
+  .collapse-btn {
+    display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 12px; padding: 10px 14px; position: relative;
+    font: inherit; font-weight: 500; color: var(--muted); background: none; border: 0; border-top: 1px solid var(--border); border-radius: 0; cursor: pointer;
+  }
+  .collapse-btn:hover { color: var(--ink); }
+  .shell.collapsed { grid-template-columns: 72px 1fr; }
+  .shell.collapsed .sidebar { padding: 20px 8px; }
+  .shell.collapsed .nav-label { display: none; }
+  .shell.collapsed .nav-link, .shell.collapsed .collapse-btn { justify-content: center; padding: 10px; }
+  .shell.collapsed [data-tip]:hover::after, .shell.collapsed [data-tip]:focus-visible::after {
+    content: attr(data-tip); position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%); z-index: 50; pointer-events: none;
+    padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; white-space: nowrap; color: var(--surface); background: var(--ink);
+  }
+}
+@media (max-width: 900px) {
+  .range-picker { align-items: flex-start; }
+}
+
+/* ---- Dark mode v2: layered navy (page darkest, sidebar and navbar next, cards lighter) ---- */
+html[data-theme="dark"] {
+  --bg: #0a0f1e; --surface: #131c33; --field: #0d1527; --border: #243252; --ink: #e8edf6; --muted: #9fb0c8;
+  --accent: #17808a; --accent-dark: #126a73;
+  --chart-1: #5eead4; --chart-2: #a5b4fc; --chart-3: #fcd34d;
+  --role-admin: #fda4af; --role-editor: #a5b4fc; --role-viewer: #5eead4;
+}
+html[data-theme="dark"] .sidebar, html[data-theme="dark"] .navbar { background: #0d1428; border-color: #1b2742; }
+html[data-theme="dark"] th { background: rgba(255, 255, 255, 0.03); }
+html[data-theme="dark"] .dropdown, html[data-theme="dark"] .modal { background: #19243f; border-color: #2c3d63; }
+html[data-theme="dark"] .brand-panel { background-color: #080d1a; }
+html[data-theme="dark"] .cards-grid .card:nth-child(1) { --tone: #a5b4fc; }
+html[data-theme="dark"] .cards-grid .card:nth-child(2) { --tone: #5eead4; }
+html[data-theme="dark"] .cards-grid .card:nth-child(3) { --tone: #fcd34d; }
+html[data-theme="dark"] .cards-grid .card:nth-child(4) { --tone: #fda4af; }
+html[data-theme="dark"] .range-btn.active { color: #fff; }
+
+
+/* Dark mode: tooltip and pie label text (Recharts sets black text on pie tooltips) */
+html[data-theme="dark"] .recharts-default-tooltip { color: var(--ink) !important; }
+html[data-theme="dark"] .recharts-tooltip-item { color: var(--ink) !important; }
+html[data-theme="dark"] .recharts-pie-label-text { fill: var(--ink); }

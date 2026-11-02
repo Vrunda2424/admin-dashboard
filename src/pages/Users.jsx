@@ -1,9 +1,18 @@
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Download, Search } from "lucide-react";
 import PageHeader from "../components/PageHeader.jsx";
 import UsersTable from "../components/UsersTable.jsx";
 import Pagination from "../components/Pagination.jsx";
 import { users } from "../data/dashboardData.js";
+import { downloadCsv } from "../utils/csv.js";
+
+const CSV_COLUMNS = [
+  { label: "Name", value: (u) => u.name },
+  { label: "Email", value: (u) => u.email },
+  { label: "Role", value: (u) => u.role },
+  { label: "Registered", value: (u) => u.registeredAt.toLocaleDateString("en-CA") },
+  { label: "Status", value: (u) => u.status },
+];
 
 const newestFirst = [...users].sort((a, b) => b.registeredAt - a.registeredAt);
 
@@ -27,6 +36,9 @@ export default function Users() {
   const start = (current - 1) * pageSize;
   const rows = filtered.slice(start, start + pageSize);
 
+  // Exports every row that matches the search and status filter, not only the current page.
+  const exportCsv = () => downloadCsv("users.csv", CSV_COLUMNS, filtered);
+
   // Any change to the search, filter, or page size starts again from page 1.
   const update = (setter) => (e) => {
     setter(e.target.value);
@@ -35,7 +47,12 @@ export default function Users() {
 
   return (
     <>
-      <PageHeader title="Users" subtitle="Search, filter, and browse all registered users." />
+      <div className="page-top">
+        <PageHeader title="Users" subtitle="Search, filter, and browse all registered users." />
+        <button type="button" className="btn-secondary" onClick={exportCsv} disabled={filtered.length === 0}>
+          <Download size={16} aria-hidden="true" /> Export CSV
+        </button>
+      </div>
       <section className="card">
         <div className="toolbar">
           <div className="search">

@@ -24,3 +24,5 @@ async function request(path, body) {
 export const registerRequest = (username, password) => request("/api/register", { username, password });
 export const loginRequest = (username, password) => request("/api/login", { username, password });
 export const fetchUsers = () => request("/api/users");
+export const changePasswordRequest = (username, currentPassword, newPassword) =>
+  request("/api/change-password", { username, current_password: currentPassword, new_password: newPassword });

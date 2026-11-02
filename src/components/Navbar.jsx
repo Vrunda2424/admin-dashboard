@@ -1,12 +1,13 @@
 import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, User, LogOut, ShieldCheck, Sun, Moon } from "lucide-react";
+import { Menu, User, LogOut, ShieldCheck, KeyRound, Sun, Moon } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import useDismiss from "../hooks/useDismiss.js";
 import Logo from "./Logo.jsx";
 import NotificationBell from "./NotificationBell.jsx";
+import ChangePasswordModal from "./ChangePasswordModal.jsx";
 
 export default function Navbar({ onMenuClick }) {
   const { username, logout } = useAuth();
@@ -14,6 +15,7 @@ export default function Navbar({ onMenuClick }) {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
   const menuRef = useRef(null);
   const close = useCallback(() => setOpen(false), []);
   useDismiss(menuRef, close);
@@ -23,9 +25,22 @@ export default function Navbar({ onMenuClick }) {
     navigate("/uam");
   };
 
+  const openChangePassword = () => {
+    setOpen(false);
+    setPasswordOpen(true);
+  };
+
   const handleLogout = () => {
     logout();
     showToast("Logged out", "success");
+    navigate("/login", { replace: true });
+  };
+
+  // After a successful change the user must sign in again with the new password.
+  const handlePasswordChanged = () => {
+    setPasswordOpen(false);
+    logout();
+    showToast("Password changed. Please sign in again.", "success");
     navigate("/login", { replace: true });
   };
 
@@ -38,24 +53,12 @@ export default function Navbar({ onMenuClick }) {
         <Logo />
       </div>
       <div className="navbar-actions">
-        <button
-          type="button"
-          className="profile-btn"
-          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          onClick={toggleTheme}
-        >
+        <button type="button" className="profile-btn" aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"} onClick={toggleTheme}>
           {theme === "dark" ? <Sun size={20} aria-hidden="true" /> : <Moon size={20} aria-hidden="true" />}
         </button>
         <NotificationBell />
         <div className="profile" ref={menuRef}>
-          <button
-            type="button"
-            className="profile-btn"
-            aria-label="Open profile menu"
-            aria-haspopup="menu"
-            aria-expanded={open}
-            onClick={() => setOpen((o) => !o)}
-          >
+          <button type="button" className="profile-btn" aria-label="Open profile menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
             <User size={20} aria-hidden="true" />
           </button>
           {open && (
@@ -64,6 +67,9 @@ export default function Navbar({ onMenuClick }) {
               <button type="button" role="menuitem" className="dropdown-item" onClick={goToUam}>
                 <ShieldCheck size={16} aria-hidden="true" /> User Access Management
               </button>
+              <button type="button" role="menuitem" className="dropdown-item" onClick={openChangePassword}>
+                <KeyRound size={16} aria-hidden="true" /> Change Password
+              </button>
               <button type="button" role="menuitem" className="dropdown-logout" onClick={handleLogout}>
                 <LogOut size={16} aria-hidden="true" /> Logout
               </button>
@@ -71,6 +77,7 @@ export default function Navbar({ onMenuClick }) {
           )}
         </div>
       </div>
+      {passwordOpen && <ChangePasswordModal username={username} onClose={() => setPasswordOpen(false)} onChanged={handlePasswordChanged} />}
     </header>
   );
 }
