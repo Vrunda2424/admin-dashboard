@@ -9,7 +9,10 @@ import { downloadCsv } from "../utils/csv.js";
 const CSV_COLUMNS = [
   { label: "ID", value: (u) => u.id },
   { label: "Username", value: (u) => u.username },
-  { label: "Registered (UTC)", value: (u) => u.created_at },
+  { label: "Email", value: (u) => u.email },
+  { label: "Role", value: (u) => u.role },
+  { label: "Status", value: (u) => u.status },
+  { label: "Registration Date (UTC)", value: (u) => u.registration_date },
 ];
 
 export default function UserAccess() {

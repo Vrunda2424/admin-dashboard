@@ -33,7 +33,7 @@ export default function DashboardLayout() {
   return (
     <div className={`shell${collapsed ? " collapsed" : ""}`}>
       <Navbar onMenuClick={() => setMenuOpen((o) => !o)} />
-      <Sidebar open={menuOpen} onClose={closeMenu} collapsed={collapsed} onToggleCollapse={() => setCollapsed((c) => !c)} />
+      <Sidebar open={menuOpen} onClose={closeMenu} collapsed={collapsed} onToggleCollapse={() => setCollapsed((c) => !c)} onExpand={() => setCollapsed(false)} />
       <div className="main-col">
         <main className="content">
           {SPINNER_PATHS.includes(pathname) ? (

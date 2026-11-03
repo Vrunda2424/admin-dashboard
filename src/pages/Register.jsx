@@ -3,15 +3,15 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import AuthLayout from "../components/AuthLayout.jsx";
-import FormField from "../components/FormField.jsx";
+import UserFormFields, { EMPTY_USER } from "../components/UserFormFields.jsx";
 import { registerRequest } from "../services/api.js";
-import { validateCredentials } from "../utils/validators.js";
+import { validateUser } from "../utils/validators.js";
 
 export default function Register() {
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const [values, setValues] = useState({ username: "", password: "" });
+  const [values, setValues] = useState(EMPTY_USER);
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,13 +27,13 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const found = validateCredentials(values);
+    const found = validateUser(values);
     setErrors(found);
     if (Object.keys(found).length > 0) return; // blocked until every rule passes
 
     setLoading(true);
     try {
-      await registerRequest(values.username.trim(), values.password);
+      await registerRequest({ ...values, username: values.username.trim(), email: values.email.trim() });
       showToast("Registration successful", "success");
       navigate("/login", { replace: true, state: { registered: true } });
     } catch (err) {
@@ -46,12 +46,11 @@ export default function Register() {
     <AuthLayout>
       <form className="login-card" onSubmit={handleSubmit} noValidate>
         <h1>Create account</h1>
-        <p className="muted">Choose a username and a strong password.</p>
+        <p className="muted">Fill in your details to register.</p>
 
         {serverError && <div className="alert" role="alert">{serverError}</div>}
 
-        <FormField label="Username" name="username" value={values.username} onChange={handleChange} error={errors.username} autoComplete="username" />
-        <FormField label="Password" name="password" type="password" value={values.password} onChange={handleChange} error={errors.password} autoComplete="new-password" />
+        <UserFormFields values={values} errors={errors} onChange={handleChange} />
 
         <button type="submit" className="btn-primary" disabled={loading}>{loading ? "Creating..." : "Register"}</button>
         <p className="muted">Already have an account? <Link to="/login">Sign in</Link></p>

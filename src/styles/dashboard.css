@@ -257,7 +257,7 @@ html[data-theme="dark"] {
 /* ---- Dark mode v2: layered navy (page darkest, sidebar and navbar next, cards lighter) ---- */
 html[data-theme="dark"] {
   --bg: #0a0f1e; --surface: #131c33; --field: #0d1527; --border: #243252; --ink: #e8edf6; --muted: #9fb0c8;
-  --accent: #17808a; --accent-dark: #126a73;
+  --accent: #1f8f9a; --accent-dark: #187680;
   --chart-1: #5eead4; --chart-2: #a5b4fc; --chart-3: #fcd34d;
   --role-admin: #fda4af; --role-editor: #a5b4fc; --role-viewer: #5eead4;
 }
@@ -271,8 +271,32 @@ html[data-theme="dark"] .cards-grid .card:nth-child(3) { --tone: #fcd34d; }
 html[data-theme="dark"] .cards-grid .card:nth-child(4) { --tone: #fda4af; }
 html[data-theme="dark"] .range-btn.active { color: #fff; }
 
-
 /* Dark mode: tooltip and pie label text (Recharts sets black text on pie tooltips) */
 html[data-theme="dark"] .recharts-default-tooltip { color: var(--ink) !important; }
 html[data-theme="dark"] .recharts-tooltip-item { color: var(--ink) !important; }
 html[data-theme="dark"] .recharts-pie-label-text { fill: var(--ink); }
+
+/* ---- Sidebar: icon-only toggle at the top, nested tabs ---- */
+:root { --chart-4: #e5484d; }
+html[data-theme="dark"] { --chart-4: #fda4af; }
+.field select { padding: 12px; font: inherit; color: var(--ink); border: 1px solid var(--border); border-radius: 6px; background: var(--field); }
+.sidebar-top { display: none; }
+.nav-group { width: 100%; font: inherit; font-weight: 500; text-align: left; background: none; border: 0; cursor: pointer; }
+.nav-group.parent-active { color: var(--ink); }
+.chevron { margin-left: auto; transition: transform 0.2s ease; }
+.chevron.open { transform: rotate(180deg); }
+.sub-list { margin: 0 0 6px 18px; padding-left: 12px; border-left: 1px solid var(--border); }
+.sub-link { display: block; margin-bottom: 2px; padding: 8px 12px; border-radius: 6px; font-size: 0.92rem; color: var(--muted); text-decoration: none; }
+.sub-link:hover { background: var(--bg); color: var(--ink); }
+.sub-link.active { background: #e3f4f5; color: var(--accent-dark); font-weight: 600; }
+html[data-theme="dark"] .sub-link.active { background: #12303a; color: #7fdce3; }
+@media (min-width: 1025px) {
+  .sidebar-top { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+  .collapse-btn {
+    display: grid; place-items: center; width: 36px; height: 36px; margin: 0; padding: 0;
+    color: var(--muted); border: 1px solid var(--border); border-radius: 8px;
+  }
+  .shell.collapsed .sidebar-top { justify-content: center; }
+  .shell.collapsed .collapse-btn { padding: 0; }
+  .shell.collapsed .sub-list, .shell.collapsed .chevron { display: none; }
+}

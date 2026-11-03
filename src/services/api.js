@@ -21,7 +21,7 @@ async function request(path, body) {
   return data;
 }
 
-export const registerRequest = (username, password) => request("/api/register", { username, password });
+export const registerRequest = (user) => request("/api/register", user);
 export const loginRequest = (username, password) => request("/api/login", { username, password });
 export const fetchUsers = () => request("/api/users");
 export const changePasswordRequest = (username, currentPassword, newPassword) =>
