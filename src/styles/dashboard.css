@@ -300,3 +300,38 @@ html[data-theme="dark"] .sub-link.active { background: #12303a; color: #7fdce3; 
   .shell.collapsed .collapse-btn { padding: 0; }
   .shell.collapsed .sub-list, .shell.collapsed .chevron { display: none; }
 }
+
+/* ---- UAM actions: icon buttons, detail rows, confirm popup ---- */
+.actions-col { position: sticky; right: 0; white-space: nowrap; background: var(--surface); box-shadow: -8px 0 8px -8px rgba(0, 0, 0, 0.18); }
+html[data-theme="dark"] th.actions-col { background: var(--surface); }
+.icon-actions { display: flex; gap: 4px; }
+.icon-btn {
+  width: 36px; height: 36px; display: grid; place-items: center; cursor: pointer;
+  background: none; border: 1px solid transparent; border-radius: 8px; transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+.icon-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.icon-btn.view { color: #16803c; }
+.icon-btn.view:hover:not(:disabled) { background: rgba(22, 128, 60, 0.12); border-color: rgba(22, 128, 60, 0.35); }
+.icon-btn.edit { color: #2563eb; }
+.icon-btn.edit:hover:not(:disabled) { background: rgba(37, 99, 235, 0.12); border-color: rgba(37, 99, 235, 0.35); }
+.icon-btn.delete { color: #c0332b; }
+.icon-btn.delete:hover:not(:disabled) { background: rgba(192, 51, 43, 0.12); border-color: rgba(192, 51, 43, 0.35); }
+.icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+html[data-theme="dark"] .icon-btn.view { color: #4ade80; }
+html[data-theme="dark"] .icon-btn.edit { color: #60a5fa; }
+html[data-theme="dark"] .icon-btn.delete { color: #fda4af; }
+
+.details { display: grid; gap: 10px; margin: 0; }
+.details-row { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: baseline; }
+.details dt { color: var(--muted); font-size: 0.9rem; }
+.details dd { margin: 0; font-weight: 500; word-break: break-word; }
+.modal-form { display: flex; flex-direction: column; gap: 14px; }
+.modal.confirm { max-width: 380px; }
+.confirm-text { margin: 0; font-weight: 600; }
+.modal .muted { margin: 0; }
+.btn-danger { padding: 11px 18px; font: inherit; font-weight: 600; color: #fff; background: #c0332b; border: 0; border-radius: 6px; cursor: pointer; }
+.btn-danger:hover:not(:disabled) { background: #a02a23; }
+.btn-danger:disabled { opacity: 0.6; cursor: not-allowed; }
+@media (max-width: 480px) {
+  .details-row { grid-template-columns: 1fr; gap: 2px; }
+}
