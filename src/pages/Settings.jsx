@@ -1,19 +1,13 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import FormField from "../components/FormField.jsx";
-import { currentUserProfile } from "../data/dashboardData.js";
+import { Spinner, ErrorPanel } from "../components/FetchState.jsx";
+import useApi from "../hooks/useApi.js";
+import { fetchSettings, saveSettings } from "../services/api.js";
 
-const STORAGE_KEY = "profile";
 const EDITABLE = ["name", "email", "phone"];
-
-const loadProfile = () => {
-  try {
-    return { ...currentUserProfile, ...JSON.parse(localStorage.getItem(STORAGE_KEY)) };
-  } catch {
-    return currentUserProfile;
-  }
-};
 
 const validate = ({ name, email, phone }) => {
   const errors = {};
@@ -25,12 +19,13 @@ const validate = ({ name, email, phone }) => {
   return errors;
 };
 
-export default function Settings() {
-  const { username } = useAuth();
-  const [saved, setSaved] = useState(loadProfile);
-  const [values, setValues] = useState(saved);
+function SettingsForm({ profile }) {
+  const { showToast } = useToast();
+  const [saved, setSaved] = useState(profile);
+  const [values, setValues] = useState(profile);
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
   const dirty = EDITABLE.some((k) => values[k] !== saved[k]);
 
   const handleChange = (e) => {
@@ -40,16 +35,24 @@ export default function Settings() {
     setMessage("");
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     const found = validate(values);
     setErrors(found);
     if (Object.keys(found).length > 0) return;
-    const next = { ...values, name: values.name.trim(), email: values.email.trim() };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    setSaved(next);
-    setValues(next);
-    setMessage("Profile updated.");
+
+    setSaving(true);
+    try {
+      const { profile: updated } = await saveSettings({ username: saved.username, name: values.name, email: values.email, phone: values.phone });
+      setSaved(updated);
+      setValues(updated);
+      setMessage("Profile updated.");
+      showToast("Profile updated", "success");
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -59,29 +62,38 @@ export default function Settings() {
   };
 
   return (
+    <div className="settings-grid">
+      <section className="card profile-card">
+        <div className="avatar" aria-hidden="true">{saved.name.charAt(0).toUpperCase()}</div>
+        <h3>{saved.name}</h3>
+        <p className="muted">{saved.email || "No email on file"}</p>
+        <p className="muted">Username: {saved.username}</p>
+        <span className="badge active">{saved.role}</span>
+      </section>
+
+      <form className="card settings-form" onSubmit={handleSave} noValidate>
+        <h3>Edit profile</h3>
+        {message && <div className="success" role="status">{message}</div>}
+        <FormField label="Full name" name="name" value={values.name} onChange={handleChange} error={errors.name} />
+        <FormField label="Email" name="email" type="email" value={values.email} onChange={handleChange} error={errors.email} />
+        <FormField label="Phone" name="phone" type="tel" value={values.phone} onChange={handleChange} error={errors.phone} inputMode="numeric" />
+        <div className="form-actions">
+          <button type="submit" className="btn-primary" disabled={!dirty || saving}>{saving ? "Saving..." : "Save changes"}</button>
+          <button type="button" className="btn-secondary" disabled={!dirty || saving} onClick={handleCancel}>Cancel</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+export default function Settings() {
+  const { username } = useAuth();
+  const { data, loading, error, reload } = useApi(() => fetchSettings(username), [username]);
+
+  return (
     <>
       <PageHeader title="Settings" subtitle="View and edit your profile." />
-      <div className="settings-grid">
-        <section className="card profile-card">
-          <div className="avatar" aria-hidden="true">{saved.name.charAt(0).toUpperCase()}</div>
-          <h3>{saved.name}</h3>
-          <p className="muted">{saved.email}</p>
-          <p className="muted">Username: {username}</p>
-          <span className="badge active">{saved.role}</span>
-        </section>
-
-        <form className="card settings-form" onSubmit={handleSave} noValidate>
-          <h3>Edit profile</h3>
-          {message && <div className="success" role="status">{message}</div>}
-          <FormField label="Full name" name="name" value={values.name} onChange={handleChange} error={errors.name} />
-          <FormField label="Email" name="email" type="email" value={values.email} onChange={handleChange} error={errors.email} />
-          <FormField label="Phone" name="phone" type="tel" value={values.phone} onChange={handleChange} error={errors.phone} inputMode="numeric" />
-          <div className="form-actions">
-            <button type="submit" className="btn-primary" disabled={!dirty}>Save changes</button>
-            <button type="button" className="btn-secondary" disabled={!dirty} onClick={handleCancel}>Cancel</button>
-          </div>
-        </form>
-      </div>
+      {!data ? (loading ? <Spinner /> : <ErrorPanel message={error} onRetry={reload} />) : <SettingsForm profile={data.profile} />}
     </>
   );
 }

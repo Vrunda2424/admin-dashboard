@@ -1,30 +1,47 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+import axios from "axios";
 
-// One place for every backend call, so pages stay free of fetch details.
-async function request(path, { method = "GET", body } = {}) {
-  let response;
-  try {
-    response = await fetch(`${API_URL}${path}`, {
-      method,
-      headers: body ? { "Content-Type": "application/json" } : undefined,
-      body: body ? JSON.stringify(body) : undefined,
-    });
-  } catch {
-    throw new Error("Cannot reach the server. Check that the Flask backend is running.");
-  }
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const error = new Error(data.message || "Something went wrong. Please try again.");
-    error.status = response.status;
-    throw error;
-  }
-  return data;
-}
+const http = axios.create({ baseURL: import.meta.env.VITE_API_URL || "http://localhost:5001" });
 
-export const registerRequest = (user) => request("/api/register", { method: "POST", body: user });
-export const loginRequest = (username, password) => request("/api/login", { method: "POST", body: { username, password } });
+// Every failure becomes a plain Error with a readable message and the HTTP status.
+http.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    const message = error.response
+      ? error.response.data?.message || "Something went wrong. Please try again."
+      : "Cannot reach the server. Check that the Flask backend is running.";
+    const err = new Error(message);
+    err.status = error.response?.status;
+    return Promise.reject(err);
+  }
+);
+
+// "2026-10-25" becomes a local Date, so it never shifts to the previous day.
+const toDate = (iso) => {
+  const [year, month, day] = iso.slice(0, 10).split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+const withDates = (users) => users.map((u) => ({ ...u, registeredAt: toDate(u.registeredAt) }));
+
+// ---- accounts ----
+export const registerRequest = (user) => http.post("/api/register", user);
+export const loginRequest = (username, password) => http.post("/api/login", { username, password });
 export const changePasswordRequest = (username, currentPassword, newPassword) =>
-  request("/api/change-password", { method: "POST", body: { username, current_password: currentPassword, new_password: newPassword } });
-export const fetchUsers = () => request("/api/users");
-export const updateUserRequest = (id, { role, status }) => request(`/api/users/${id}`, { method: "PUT", body: { role, status } });
-export const deleteUserRequest = (id) => request(`/api/users/${id}`, { method: "DELETE" });
+  http.post("/api/change-password", { username, current_password: currentPassword, new_password: newPassword });
+export const fetchUsers = () => http.get("/api/users");
+export const updateUserRequest = (id, { role, status }) => http.put(`/api/users/${id}`, { role, status });
+export const deleteUserRequest = (id) => http.delete(`/api/users/${id}`);
+
+// ---- page data (each one reads from the database through Flask) ----
+export const fetchOverview = async (range) => {
+  const data = await http.get("/api/overview", { params: { range } });
+  return { ...data, recentUsers: withDates(data.recentUsers) };
+};
+export const fetchAnalytics = (range) => http.get("/api/analytics", { params: { range } });
+export const fetchUsersPage = async () => withDates((await http.get("/api/users-page")).users);
+
+const slugs = { internet: "internet-banking", mobile: "mobile-banking" };
+export const fetchBankingDashboard = (channel) => http.get(`/api/${slugs[channel]}/dashboard`);
+export const fetchBankingUsers = (channel) => http.get(`/api/${slugs[channel]}/users`);
+
+export const fetchSettings = (username) => http.get("/api/settings", { params: { username } });
+export const saveSettings = (profile) => http.put("/api/settings", profile);

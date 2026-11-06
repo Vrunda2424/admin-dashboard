@@ -335,3 +335,6 @@ html[data-theme="dark"] .icon-btn.delete { color: #fda4af; }
 @media (max-width: 480px) {
   .details-row { grid-template-columns: 1fr; gap: 2px; }
 }
+
+/* ---- Data loaded from the API ---- */
+.dim { opacity: 0.55; transition: opacity 0.15s ease; }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Users, UserCheck, UserX, UserPlus } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import PageHeader from "../components/PageHeader.jsx";
@@ -9,12 +9,11 @@ import RecentRegistrationsTable from "../components/RecentRegistrationsTable.jsx
 import RegistrationsLineChart from "../components/charts/RegistrationsLineChart.jsx";
 import UserGrowthBarChart from "../components/charts/UserGrowthBarChart.jsx";
 import StatusDoughnutChart from "../components/charts/StatusDoughnutChart.jsx";
-import { buildStats } from "../data/dashboardData.js";
+import { Spinner, ErrorPanel } from "../components/FetchState.jsx";
+import useApi from "../hooks/useApi.js";
+import { fetchOverview } from "../services/api.js";
 
-export default function Overview() {
-  const { username } = useAuth();
-  const [range, setRange] = useState("year");
-  const stats = useMemo(() => buildStats(range), [range]);
+function OverviewContent({ stats, updating }) {
   const { summary } = stats;
   const cards = [
     { label: "Total registered users", value: summary.total, icon: Users },
@@ -22,13 +21,8 @@ export default function Overview() {
     { label: "Inactive users", value: summary.inactive, icon: UserX },
     { label: "New registrations this month", value: summary.newThisMonth, icon: UserPlus },
   ];
-
   return (
-    <>
-      <div className="page-top">
-        <PageHeader title={`Welcome back, ${username}`} subtitle="Here is an overview of your users." />
-        <DateRangePicker value={range} onChange={setRange} label={stats.label} />
-      </div>
+    <div className={updating ? "dim" : undefined}>
       <div className="cards-grid">
         {cards.map((c) => (
           <SummaryCard key={c.label} {...c} />
@@ -40,6 +34,22 @@ export default function Overview() {
         <ChartCard title="User growth" wide><UserGrowthBarChart data={stats.userGrowth} /></ChartCard>
       </div>
       <RecentRegistrationsTable users={stats.recentUsers} />
+    </div>
+  );
+}
+
+export default function Overview() {
+  const { username } = useAuth();
+  const [range, setRange] = useState("year");
+  const { data: stats, loading, error, reload } = useApi(() => fetchOverview(range), [range]);
+
+  return (
+    <>
+      <div className="page-top">
+        <PageHeader title={`Welcome back, ${username}`} subtitle="Here is an overview of your users." />
+        <DateRangePicker value={range} onChange={setRange} label={stats?.label ?? ""} />
+      </div>
+      {!stats ? (loading ? <Spinner /> : <ErrorPanel message={error} onRetry={reload} />) : <OverviewContent stats={stats} updating={loading} />}
     </>
   );
 }

@@ -3,7 +3,9 @@ import { Download, Search } from "lucide-react";
 import PageHeader from "../components/PageHeader.jsx";
 import UsersTable from "../components/UsersTable.jsx";
 import Pagination from "../components/Pagination.jsx";
-import { users } from "../data/dashboardData.js";
+import { Spinner, ErrorPanel } from "../components/FetchState.jsx";
+import useApi from "../hooks/useApi.js";
+import { fetchUsersPage } from "../services/api.js";
 import { downloadCsv } from "../utils/csv.js";
 
 const CSV_COLUMNS = [
@@ -14,14 +16,14 @@ const CSV_COLUMNS = [
   { label: "Status", value: (u) => u.status },
 ];
 
-const newestFirst = [...users].sort((a, b) => b.registeredAt - a.registeredAt);
-
 export default function Users() {
+  const { data: users, loading, error, reload } = useApi(fetchUsersPage, []);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("All");
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
 
+  const newestFirst = useMemo(() => [...(users ?? [])].sort((a, b) => b.registeredAt - a.registeredAt), [users]);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return newestFirst.filter(
@@ -29,7 +31,9 @@ export default function Users() {
         (status === "All" || u.status === status) &&
         (!q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))
     );
-  }, [query, status]);
+  }, [newestFirst, query, status]);
+
+  if (!users) return loading ? <Spinner /> : <ErrorPanel message={error} onRetry={reload} />;
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const current = Math.min(page, pageCount);

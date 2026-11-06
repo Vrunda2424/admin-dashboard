@@ -4,11 +4,15 @@ import ChartCard from "../components/ChartCard.jsx";
 import TrendChart from "../components/charts/TrendChart.jsx";
 import CategoryBarChart from "../components/charts/CategoryBarChart.jsx";
 import SplitChart from "../components/charts/SplitChart.jsx";
-import { banking } from "../data/bankingData.js";
+import { Spinner, ErrorPanel } from "../components/FetchState.jsx";
+import useApi from "../hooks/useApi.js";
+import { fetchBankingDashboard } from "../services/api.js";
 
-// One page for both channels: the channel prop picks which dummy data to show.
+// One page for both channels: the channel prop picks which API to call.
 export default function BankingDashboard({ channel }) {
-  const d = banking[channel];
+  const { data: d, loading, error, reload } = useApi(() => fetchBankingDashboard(channel), [channel]);
+  if (!d) return loading ? <Spinner /> : <ErrorPanel message={error} onRetry={reload} />;
+
   return (
     <>
       <PageHeader title={`${d.name} Dashboard`} subtitle={d.subtitle} />

@@ -1,4 +1,4 @@
-import { RANGE_OPTIONS } from "../data/dashboardData.js";
+import { RANGE_OPTIONS } from "../data/rangeOptions.js";
 
 export default function DateRangePicker({ value, onChange, label }) {
   return (

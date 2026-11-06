@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
 import Sidebar from "./Sidebar.jsx";
 import Footer from "./Footer.jsx";
-import PageLoader from "./PageLoader.jsx";
 import "../styles/dashboard.css";
 
-const SPINNER_PATHS = ["/dashboard", "/users", "/analytics", "/settings"];
 const COLLAPSE_KEY = "sidebarCollapsed";
 
 // Shared shell: navbar, sidebar, and footer stay on every page, only the page content changes.
@@ -19,7 +17,6 @@ export default function DashboardLayout() {
       return false;
     }
   });
-  const { pathname } = useLocation();
   const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
@@ -36,11 +33,7 @@ export default function DashboardLayout() {
       <Sidebar open={menuOpen} onClose={closeMenu} collapsed={collapsed} onToggleCollapse={() => setCollapsed((c) => !c)} onExpand={() => setCollapsed(false)} />
       <div className="main-col">
         <main className="content">
-          {SPINNER_PATHS.includes(pathname) ? (
-            <PageLoader key={pathname}><Outlet /></PageLoader>
-          ) : (
-            <Outlet />
-          )}
+          <Outlet />
         </main>
         <Footer />
       </div>
