@@ -338,3 +338,27 @@ html[data-theme="dark"] .icon-btn.delete { color: #fda4af; }
 
 /* ---- Data loaded from the API ---- */
 .dim { opacity: 0.55; transition: opacity 0.15s ease; }
+
+/* ---- User logs: clickable rows, status badges, side drawer ---- */
+.badge.success { background: #e3f4f5; color: var(--accent-dark); }
+.badge.failed { background: var(--danger-bg); color: var(--danger); }
+html[data-theme="dark"] .badge.success { background: #12303a; color: #7fdce3; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td, tr.clickable.selected td { background: rgba(14, 124, 134, 0.09); }
+tr.clickable:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.drawer-backdrop { position: fixed; inset: 0; z-index: 70; background: rgba(15, 27, 45, 0.5); opacity: 0; transition: opacity 0.25s ease; }
+.drawer-backdrop.open { opacity: 1; }
+.drawer {
+  position: absolute; top: 0; right: 0; bottom: 0; width: min(440px, 100vw); padding: 20px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 18px; background: var(--surface); border-left: 1px solid var(--border);
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.18); transform: translateX(100%); transition: transform 0.25s ease;
+}
+.drawer.open { transform: none; }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.drawer-head h3 { margin: 0; font-size: 1.15rem; }
+.drawer .icon-btn { color: var(--muted); }
+.drawer .icon-btn:hover { background: var(--bg); color: var(--ink); }
+html[data-theme="dark"] .drawer { background: #19243f; border-color: #2c3d63; }
+@media (max-width: 480px) { .drawer { padding: 16px; } }
+@media (prefers-reduced-motion: reduce) { .drawer, .drawer-backdrop { transition: none; } }

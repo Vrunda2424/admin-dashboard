@@ -8,6 +8,7 @@ import Settings from "./pages/Settings.jsx";
 import UserAccess from "./pages/UserAccess.jsx";
 import BankingDashboard from "./pages/BankingDashboard.jsx";
 import BankingUsers from "./pages/BankingUsers.jsx";
+import BankingLogs from "./pages/BankingLogs.jsx";
 import DashboardLayout from "./components/DashboardLayout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
@@ -25,8 +26,10 @@ export default function App() {
         <Route path="/uam" element={<UserAccess />} />
         <Route path="/internet-banking/dashboard" element={<BankingDashboard channel="internet" />} />
         <Route path="/internet-banking/users" element={<BankingUsers channel="internet" />} />
+        <Route path="/internet-banking/user-logs" element={<BankingLogs key="internet" channel="internet" />} />
         <Route path="/mobile-banking/dashboard" element={<BankingDashboard channel="mobile" />} />
         <Route path="/mobile-banking/users" element={<BankingUsers channel="mobile" />} />
+        <Route path="/mobile-banking/user-logs" element={<BankingLogs key="mobile" channel="mobile" />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

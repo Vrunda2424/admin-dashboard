@@ -13,11 +13,11 @@ const LINKS = [
 const GROUPS = [
   {
     key: "internet", label: "Internet Banking", icon: Landmark, base: "/internet-banking",
-    children: [{ to: "/internet-banking/dashboard", label: "Dashboard" }, { to: "/internet-banking/users", label: "User Details" }],
+    children: [{ to: "/internet-banking/dashboard", label: "Dashboard" }, { to: "/internet-banking/users", label: "User Details" }, { to: "/internet-banking/user-logs", label: "User Logs" }],
   },
   {
     key: "mobile", label: "Mobile Banking", icon: Smartphone, base: "/mobile-banking",
-    children: [{ to: "/mobile-banking/dashboard", label: "Dashboard" }, { to: "/mobile-banking/users", label: "User Details" }],
+    children: [{ to: "/mobile-banking/dashboard", label: "Dashboard" }, { to: "/mobile-banking/users", label: "User Details" }, { to: "/mobile-banking/user-logs", label: "User Logs" }],
   },
 ];
 
