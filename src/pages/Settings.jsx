@@ -6,6 +6,7 @@ import FormField from "../components/FormField.jsx";
 import { Spinner, ErrorPanel } from "../components/FetchState.jsx";
 import useApi from "../hooks/useApi.js";
 import { fetchSettings, saveSettings } from "../services/api.js";
+import { roleLabel } from "../utils/roles.js";
 
 const EDITABLE = ["name", "email", "phone"];
 
@@ -68,7 +69,7 @@ function SettingsForm({ profile }) {
         <h3>{saved.name}</h3>
         <p className="muted">{saved.email || "No email on file"}</p>
         <p className="muted">Username: {saved.username}</p>
-        <span className="badge active">{saved.role}</span>
+        <span className="badge active">{roleLabel(saved.role)}</span>
       </section>
 
       <form className="card settings-form" onSubmit={handleSave} noValidate>

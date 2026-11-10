@@ -362,3 +362,7 @@ tr.clickable:focus-visible { outline: 2px solid var(--accent); outline-offset: -
 html[data-theme="dark"] .drawer { background: #19243f; border-color: #2c3d63; }
 @media (max-width: 480px) { .drawer { padding: 16px; } }
 @media (prefers-reduced-motion: reduce) { .drawer, .drawer-backdrop { transition: none; } }
+
+/* ---- Roles ---- */
+:root { --chart-5: #8b5cf6; }
+html[data-theme="dark"] { --chart-5: #d8b4fe; }

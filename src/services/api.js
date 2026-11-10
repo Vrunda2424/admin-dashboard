@@ -1,12 +1,30 @@
 import axios from "axios";
 import once from "../utils/once.js";
+import { roleLabel } from "../utils/roles.js";
 
 const http = axios.create({ baseURL: import.meta.env.VITE_API_URL || "http://localhost:5001" });
+
+// Sends the saved token with every request.
+http.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// AuthContext registers what should happen when the server says the token is no longer valid.
+let onUnauthorized = null;
+export const setUnauthorizedHandler = (handler) => {
+  onUnauthorized = handler;
+};
+const PUBLIC_PATHS = ["/api/login", "/api/change-password"]; // a 401 here just means wrong details
 
 // Every failure becomes a plain Error with a readable message and the HTTP status.
 http.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    if (error.response?.status === 401 && !PUBLIC_PATHS.includes(error.config?.url) && localStorage.getItem("token")) {
+      onUnauthorized?.();
+    }
     const message = error.response
       ? error.response.data?.message || "Something went wrong. Please try again."
       : "Cannot reach the server. Check that the Flask backend is running.";
@@ -24,7 +42,8 @@ const toDate = (iso) => {
 const withDates = (users) => users.map((u) => ({ ...u, registeredAt: toDate(u.registeredAt) }));
 
 // ---- accounts ----
-export const registerRequest = (user) => http.post("/api/register", user);
+// Only a signed-in Super Admin or Admin can create users. There is no public registration.
+export const createUserRequest = (user) => http.post("/api/users", user);
 export const loginRequest = (username, password) => http.post("/api/login", { username, password });
 export const changePasswordRequest = (username, currentPassword, newPassword) =>
   http.post("/api/change-password", { username, current_password: currentPassword, new_password: newPassword });
@@ -39,7 +58,11 @@ export const fetchOverview = (range) =>
     const data = await http.get("/api/overview", { params: { range } });
     return { ...data, recentUsers: withDates(data.recentUsers) };
   });
-export const fetchAnalytics = (range) => once(`analytics:${range}`, () => http.get("/api/analytics", { params: { range } }));
+export const fetchAnalytics = (range) =>
+  once(`analytics:${range}`, async () => {
+    const data = await http.get("/api/analytics", { params: { range } });
+    return { ...data, roleDistribution: data.roleDistribution.map((r) => ({ ...r, name: roleLabel(r.name) })) };
+  });
 export const fetchUsersPage = () => once("users-page", async () => withDates((await http.get("/api/users-page")).users));
 
 const slugs = { internet: "internet-banking", mobile: "mobile-banking" };

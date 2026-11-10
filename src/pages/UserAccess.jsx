@@ -10,18 +10,19 @@ import EditUserModal from "../components/EditUserModal.jsx";
 import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog.jsx";
 import { fetchUsers } from "../services/api.js";
 import { downloadCsv } from "../utils/csv.js";
+import { roleLabel } from "../utils/roles.js";
 
 const CSV_COLUMNS = [
   { label: "ID", value: (u) => u.id },
   { label: "Username", value: (u) => u.username },
   { label: "Email", value: (u) => u.email },
-  { label: "Role", value: (u) => u.role },
+  { label: "Role", value: (u) => roleLabel(u.role) },
   { label: "Status", value: (u) => u.status },
   { label: "Registration Date (UTC)", value: (u) => u.registration_date },
 ];
 
 export default function UserAccess() {
-  const { username } = useAuth();
+  const { username, role } = useAuth();
   const { showToast } = useToast();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +78,7 @@ export default function UserAccess() {
           <UserAccessTable
             users={users}
             currentUsername={username}
+            actorRole={role}
             onView={(user) => setDialog({ type: "view", user })}
             onEdit={(user) => setDialog({ type: "edit", user })}
             onDelete={(user) => setDialog({ type: "delete", user })}
@@ -86,6 +88,7 @@ export default function UserAccess() {
 
       {addOpen && (
         <AddUserModal
+          actorRole={role}
           onClose={() => setAddOpen(false)}
           onCreated={() => {
             setAddOpen(false);
@@ -94,7 +97,7 @@ export default function UserAccess() {
         />
       )}
       {dialog?.type === "view" && <ViewUserModal user={dialog.user} onClose={closeDialog} />}
-      {dialog?.type === "edit" && <EditUserModal user={dialog.user} onClose={closeDialog} onSaved={() => afterChange("User updated")} />}
+      {dialog?.type === "edit" && <EditUserModal actorRole={role} user={dialog.user} onClose={closeDialog} onSaved={() => afterChange("User updated")} />}
       {dialog?.type === "delete" && <ConfirmDeleteDialog user={dialog.user} onClose={closeDialog} onDeleted={() => afterChange("User deleted")} />}
     </>
   );

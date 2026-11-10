@@ -7,11 +7,12 @@ import { Spinner, ErrorPanel } from "../components/FetchState.jsx";
 import useApi from "../hooks/useApi.js";
 import { fetchUsersPage } from "../services/api.js";
 import { downloadCsv } from "../utils/csv.js";
+import { roleLabel } from "../utils/roles.js";
 
 const CSV_COLUMNS = [
   { label: "Name", value: (u) => u.name },
   { label: "Email", value: (u) => u.email },
-  { label: "Role", value: (u) => u.role },
+  { label: "Role", value: (u) => roleLabel(u.role) },
   { label: "Registered", value: (u) => u.registeredAt.toLocaleDateString("en-CA") },
   { label: "Status", value: (u) => u.status },
 ];

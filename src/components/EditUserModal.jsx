@@ -3,9 +3,10 @@ import Modal from "./Modal.jsx";
 import DetailRows from "./DetailRows.jsx";
 import { updateUserRequest } from "../services/api.js";
 import { formatDateTime } from "../utils/format.js";
+import { assignableRoles } from "../utils/roles.js";
 
 // Only role and status can be changed. Everything else is shown as read-only text.
-export default function EditUserModal({ user, onClose, onSaved }) {
+export default function EditUserModal({ user, actorRole, onClose, onSaved }) {
   const [role, setRole] = useState(user.role);
   const [status, setStatus] = useState(user.status);
   const [error, setError] = useState("");
@@ -40,9 +41,9 @@ export default function EditUserModal({ user, onClose, onSaved }) {
         <div className="field">
           <label htmlFor="edit-role">Role</label>
           <select id="edit-role" value={role} onChange={(e) => { setRole(e.target.value); setError(""); }}>
-            <option>Admin</option>
-            <option>Editor</option>
-            <option>Viewer</option>
+            {assignableRoles(actorRole).map((r) => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
           </select>
         </div>
         <div className="field">

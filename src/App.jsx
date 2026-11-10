@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx";
 import Overview from "./pages/Overview.jsx";
 import Users from "./pages/Users.jsx";
 import Analytics from "./pages/Analytics.jsx";
@@ -11,19 +10,19 @@ import BankingUsers from "./pages/BankingUsers.jsx";
 import BankingLogs from "./pages/BankingLogs.jsx";
 import DashboardLayout from "./components/DashboardLayout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import RoleRoute from "./components/RoleRoute.jsx";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      {/* Every page inside this route needs a login and shares the same layout. */}
+      {/* Every page inside this route needs a login and shares the same layout. All roles see every tab. */}
       <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route path="/dashboard" element={<Overview />} />
         <Route path="/users" element={<Users />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/uam" element={<UserAccess />} />
+        <Route path="/uam" element={<RoleRoute><UserAccess /></RoleRoute>} />
         <Route path="/internet-banking/dashboard" element={<BankingDashboard channel="internet" />} />
         <Route path="/internet-banking/users" element={<BankingUsers channel="internet" />} />
         <Route path="/internet-banking/user-logs" element={<BankingLogs key="internet" channel="internet" />} />

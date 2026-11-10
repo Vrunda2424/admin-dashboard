@@ -1,3 +1,5 @@
+import { roleLabel } from "../utils/roles.js";
+
 const formatDate = (d) => d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
 export default function UsersTable({ users }) {
@@ -15,7 +17,7 @@ export default function UsersTable({ users }) {
               <tr key={u.id}>
                 <td>{u.name}</td>
                 <td>{u.email}</td>
-                <td>{u.role}</td>
+                <td>{roleLabel(u.role)}</td>
                 <td>{formatDate(u.registeredAt)}</td>
                 <td><span className={`badge ${u.status.toLowerCase()}`}>{u.status}</span></td>
               </tr>

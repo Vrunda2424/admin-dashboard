@@ -8,7 +8,7 @@ export default function AuthLayout({ children }) {
         <Logo />
         <div className="brand-copy">
           <h2>Everything your team needs, in one dashboard.</h2>
-          <p>Sign in or create an account to continue.</p>
+          <p>Sign in to continue.</p>
         </div>
       </aside>
       <section className="form-panel">{children}</section>

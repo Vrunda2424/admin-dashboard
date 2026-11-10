@@ -1,40 +1,56 @@
-import { createContext, useContext, useState } from "react";
-import { loginRequest } from "../services/api.js";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { loginRequest, setUnauthorizedHandler } from "../services/api.js";
+import { useToast } from "./ToastContext.jsx";
 
-const STORAGE_KEY = "username";
+const KEYS = ["username", "role", "token"];
+const EMPTY = { username: null, role: null, token: null };
 const AuthContext = createContext(null);
 
-const readStoredUser = () => {
+const readSession = () => {
   try {
-    return localStorage.getItem(STORAGE_KEY);
+    return Object.fromEntries(KEYS.map((k) => [k, localStorage.getItem(k)]));
   } catch {
-    return null;
+    return EMPTY;
   }
 };
 
 export function AuthProvider({ children }) {
+  const { showToast } = useToast();
   // Reading storage in the initializer keeps the session after a page refresh.
-  const [username, setUsername] = useState(readStoredUser);
+  const [session, setSession] = useState(readSession);
 
   // Returns { ok: true } or { ok: false, message, status } so the page can react to it.
   const login = async (inputUser, inputPassword) => {
     try {
-      const { user } = await loginRequest(inputUser, inputPassword);
-      localStorage.setItem(STORAGE_KEY, user.username);
-      setUsername(user.username);
+      const { user, token } = await loginRequest(inputUser, inputPassword);
+      localStorage.setItem("username", user.username);
+      localStorage.setItem("role", user.role);
+      localStorage.setItem("token", token);
+      setSession({ username: user.username, role: user.role, token });
       return { ok: true };
     } catch (err) {
       return { ok: false, message: err.message, status: err.status };
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setUsername(null);
-  };
+  const logout = useCallback(() => {
+    KEYS.forEach((k) => localStorage.removeItem(k));
+    setSession(EMPTY);
+  }, []);
+
+  // If the server rejects the token (expired, or the account was removed), sign the user out.
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      logout();
+      showToast("Your session has expired. Please sign in again.", "error");
+    });
+  }, [logout, showToast]);
+
+  // A session saved before roles existed has no token, so it counts as signed out.
+  const isAuthenticated = Boolean(session.username && session.role && session.token);
 
   return (
-    <AuthContext.Provider value={{ username, isAuthenticated: Boolean(username), login, logout }}>
+    <AuthContext.Provider value={{ username: session.username, role: session.role, isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

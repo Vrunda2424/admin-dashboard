@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import AuthLayout from "../components/AuthLayout.jsx";
@@ -19,7 +19,6 @@ export default function Login() {
   const { isAuthenticated, login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const registered = useLocation().state?.registered;
   const [values, setValues] = useState({ username: "", password: "", captcha: "" });
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState("");
@@ -75,7 +74,6 @@ export default function Login() {
         <h1>Sign in</h1>
         <p className="muted">Use your account to continue.</p>
 
-        {registered && !loginError && <div className="success" role="status">Account created. Please sign in.</div>}
         {loginError && <div className="alert" role="alert">{loginError}</div>}
 
         <FormField label="Username" name="username" value={values.username} onChange={handleChange} error={errors.username} autoComplete="username" />
@@ -85,7 +83,6 @@ export default function Login() {
         <FormField label="Type the text shown above (case-sensitive)" name="captcha" value={values.captcha} onChange={handleChange} error={errors.captcha} autoComplete="off" autoCapitalize="off" spellCheck={false} />
 
         <button type="submit" className="btn-primary" disabled={loading}>{loading ? "Signing in..." : "Sign in"}</button>
-        <button type="button" className="btn-secondary btn-block" onClick={() => navigate("/register")}>Register</button>
       </form>
     </AuthLayout>
   );
