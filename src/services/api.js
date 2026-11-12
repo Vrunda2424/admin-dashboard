@@ -68,8 +68,11 @@ export const fetchUsersPage = () => once("users-page", async () => withDates((aw
 const slugs = { internet: "internet-banking", mobile: "mobile-banking" };
 export const fetchBankingDashboard = (channel) => once(`dashboard:${channel}`, () => http.get(`/api/${slugs[channel]}/dashboard`));
 export const fetchBankingUsers = (channel) => once(`banking-users:${channel}`, () => http.get(`/api/${slugs[channel]}/users`));
-export const fetchBankingLogs = (channel) => once(`logs:${channel}`, () => http.get(`/api/${slugs[channel]}/user-logs`));
-export const fetchBankingLog = (channel, id) => once(`log:${channel}:${id}`, () => http.get(`/api/${slugs[channel]}/user-logs/${id}`));
+// The three log pages share one list page and one drawer. Only the address differs.
+const logPaths = { internet: "/api/internet-banking/user-logs", mobile: "/api/mobile-banking/user-logs", face: "/api/mobile-banking/face-logs" };
+export const fetchBankingLogs = (channel) => once(`logs:${channel}`, () => http.get(logPaths[channel]));
+export const fetchFaceUsers = () => once("face-users", () => http.get("/api/mobile-banking/face-users"));
+export const fetchBankingLog = (channel, id) => once(`log:${channel}:${id}`, () => http.get(`${logPaths[channel]}/${id}`));
 
 export const fetchSettings = (username) => once(`settings:${username}`, () => http.get("/api/settings", { params: { username } }));
 export const saveSettings = (profile) => http.put("/api/settings", profile);

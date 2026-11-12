@@ -8,6 +8,7 @@ import UserAccess from "./pages/UserAccess.jsx";
 import BankingDashboard from "./pages/BankingDashboard.jsx";
 import BankingUsers from "./pages/BankingUsers.jsx";
 import BankingLogs from "./pages/BankingLogs.jsx";
+import FaceUsers from "./pages/FaceUsers.jsx";
 import DashboardLayout from "./components/DashboardLayout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import RoleRoute from "./components/RoleRoute.jsx";
@@ -29,6 +30,8 @@ export default function App() {
         <Route path="/mobile-banking/dashboard" element={<BankingDashboard channel="mobile" />} />
         <Route path="/mobile-banking/users" element={<BankingUsers channel="mobile" />} />
         <Route path="/mobile-banking/user-logs" element={<BankingLogs key="mobile" channel="mobile" />} />
+        <Route path="/mobile-banking/face" element={<FaceUsers />} />
+        <Route path="/mobile-banking/face-logs" element={<BankingLogs key="face" channel="face" />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

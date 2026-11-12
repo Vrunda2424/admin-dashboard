@@ -17,7 +17,7 @@ const GROUPS = [
   },
   {
     key: "mobile", label: "Mobile Banking", icon: Smartphone, base: "/mobile-banking",
-    children: [{ to: "/mobile-banking/dashboard", label: "Dashboard" }, { to: "/mobile-banking/users", label: "User Details" }, { to: "/mobile-banking/user-logs", label: "User Logs" }],
+    children: [{ to: "/mobile-banking/dashboard", label: "Dashboard" }, { to: "/mobile-banking/users", label: "User Details" }, { to: "/mobile-banking/user-logs", label: "User Logs" }, { to: "/mobile-banking/face", label: "Face" }, { to: "/mobile-banking/face-logs", label: "Face Logs" }],
   },
 ];
 

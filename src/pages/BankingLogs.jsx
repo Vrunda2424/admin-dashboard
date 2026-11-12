@@ -14,7 +14,7 @@ export default function BankingLogs({ channel }) {
 
   return (
     <>
-      <PageHeader title={`${data.name} User Logs`} subtitle="Click a row to see the full details of a log entry." />
+      <PageHeader title={data.title} subtitle="Click a row to see the full details of a log entry." />
       <section className="card">
         <LogsTable logs={data.logs} selectedId={selectedId} onSelect={setSelectedId} />
       </section>

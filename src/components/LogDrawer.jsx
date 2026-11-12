@@ -46,6 +46,8 @@ export default function LogDrawer({ channel, logId, onClose }) {
     ["Browser", log.browser],
     ["Session ID", log.session_id],
     ["Details", log.details],
+    // Face logs also carry a match score and a liveness result.
+    ...(log.match_score === undefined ? [] : [["Face match score", log.match_score], ["Liveness check", log.liveness]]),
   ];
 
   return createPortal(
