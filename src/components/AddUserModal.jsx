@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 import UserFormFields, { EMPTY_USER } from "./UserFormFields.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import { createUserRequest } from "../services/api.js";
+import { downloadCsv } from "../utils/csv.js";
 import { validateUser } from "../utils/validators.js";
+
+const CREDENTIAL_COLUMNS = [
+  { label: "Username", value: (row) => row.username },
+  { label: "Password", value: (row) => row.password },
+];
 
 export default function AddUserModal({ actorRole, onClose, onCreated }) {
   const { showToast } = useToast();
@@ -30,10 +36,16 @@ export default function AddUserModal({ actorRole, onClose, onCreated }) {
     setErrors(found);
     if (Object.keys(found).length > 0) return;
 
+    const trimmedUsername = values.username.trim();
+    const trimmedEmail = values.email.trim();
+
     setSaving(true);
     try {
-      await createUserRequest({ ...values, username: values.username.trim(), email: values.email.trim() });
-      showToast("User added", "success");
+      await createUserRequest({ ...values, username: trimmedUsername, email: trimmedEmail });
+      downloadCsv(`${trimmedUsername}-credentials.csv`, CREDENTIAL_COLUMNS, [
+        { username: trimmedUsername, password: values.password },
+      ]);
+      showToast("User added and credentials CSV downloaded", "success");
       onCreated();
     } catch (err) {
       setServerError(err.message);
